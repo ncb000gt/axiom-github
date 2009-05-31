@@ -1,3 +1,5 @@
+/* TODO: Lots of copy and paste...must reduce. */
+
 if (!global.axiom) {
     global.axiom = {};
 }
@@ -42,7 +44,7 @@ axiom.Github = function(username, token, format, repository) {
 
 
     /* ISSUES */
-    this.search = function(term, state) {
+    this.issueSearch = function(term, state) {
 	state = state || 'open';
 	var url= [
 	    'http://github.com/api/v2',
@@ -59,7 +61,7 @@ axiom.Github = function(username, token, format, repository) {
 	return issues.issues;
     };
 
-    this.getIssues = function(state) {
+    this.issuesGet = function(state) {
 	state = state || 'open';
 	var url= [
 	    'http://github.com/api/v2',
@@ -75,7 +77,7 @@ axiom.Github = function(username, token, format, repository) {
 	return issues.issues;
     };
 
-    this.getIssue = function(number) {
+    this.issueGet = function(number) {
 	var url= [
 	    'http://github.com/api/v2',
 	    this.getFormat(),
@@ -90,7 +92,7 @@ axiom.Github = function(username, token, format, repository) {
 	return issues.issue;
     };
 
-    this.createIssue = function(title, body) {
+    this.issueCreate = function(title, body) {
 	var url= [
 	    'http://github.com/api/v2',
 	    this.getFormat(),
@@ -124,17 +126,214 @@ axiom.Github = function(username, token, format, repository) {
 
 
     /* USERS */
-    this.getUser = function(username) {
+    this.userSearch = function(username) {
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/search',
+	    username
+	].join('/');
+
+	var content = axiom.HTTP.get(url);
+	return content.user;
+    };
+
+    this.userGet = function(username) {
+	var post_data = null;
+	if (username == this.getUsername()) {
+	    post_data = {
+		login: username,
+		token: this.getToken()
+	    };
+	}
 	var url= [
 	    'http://github.com/api/v2',
 	    this.getFormat(),
 	    'user/show',
 	    username
 	].join('/');
-	
-	var content = axiom.HTTP.get(url);
+
+	var content = null;
+	if (post_data)
+	    content = axiom.HTTP.post(url, post_data);
+	else
+	    content = axiom.HTTP.get(url);
+
 	return content.user;
     };
+
+    /* TODO: Fix this API...it sucks */
+    this.userGetFollowers = function(username) {
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/show',
+	    username,
+	    'followers'
+	].join('/');
+
+	var content = axiom.HTTP.get(url);
+	return content.users;
+    };
+
+    /* TODO: Fix this API...it sucks */
+    this.userGetFollowing = function(username) {
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/show',
+	    username,
+	    'following'
+	].join('/');
+
+	var content = axiom.HTTP.get(url);
+	return content.users;
+    };
+
+    this.userFollow = function(username) {
+	var post_data = {
+		login: username,
+		token: this.getToken()
+	};
+
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/follow',
+	    username
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+
+	return content.user;
+    };
+
+    this.userUnfollow = function(username) {
+	var post_data = {
+		login: username,
+		token: this.getToken()
+	};
+
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/unfollow',
+	    username
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+
+	return content.user;
+    };
+
+    this.userGetKeys = function() {
+	var post_data = {
+	    login: username,
+	    token: this.getToken()
+	};
+
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/keys'
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+
+	return content.public_keys;
+    };
+
+    this.userAddKey = function(name, key) {
+	var post_data = {
+	    login: username,
+	    token: this.getToken(),
+	    name: name,
+	    key: key
+	};
+
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/keys/add'
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+
+	return content.public_key;
+    };
+
+    this.userRemoveKey = function(id) {
+	var post_data = {
+	    login: username,
+	    token: this.getToken(),
+	    id: id
+	};
+
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/keys/remove'
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+
+	return content.public_key;
+    };
+
+    this.userGetEmails = function() {
+	var post_data = {
+	    login: username,
+	    token: this.getToken()
+	};
+
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/emails'
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+
+	return content.emails;
+    };
+
+    this.userAddEmail = function(email) {
+	var post_data = {
+	    login: username,
+	    token: this.getToken(),
+	    email: email
+	};
+
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/email/add'
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+
+	return content.email;
+    };
+
+    this.userRemoveEmail = function(email) {
+	var post_data = {
+	    login: username,
+	    token: this.getToken(),
+	    email: email
+	};
+
+	var url= [
+	    'http://github.com/api/v2',
+	    this.getFormat(),
+	    'user/keys/remove'
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+
+	return content.email;
+    };
+
+    /*  */
 
     return this;
 };
