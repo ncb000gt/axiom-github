@@ -1,0 +1,11 @@
+axiom-github
+----------------
+
+This module is a tool that allows access to the Github API's for things like issues, users, repositories and so forth.
+
+
+Usage
+----------------
+
+Place the module into your <axiom_root>/modules directory.
+Add it to your app.properties file.
