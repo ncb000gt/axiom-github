@@ -6,6 +6,13 @@ if (!global.axiom) {
 
 axiom.Github = function(username, token, format, repository) {
     /* VARS */
+    this.API_VERSIONS = {
+	1: 'http://github.com/api/v1',
+	2: 'http://github.com/api/v2'
+    };
+
+    this.API_VERSION = 2;
+
     this.STATES = {
 	OPEN: 'open',
 	UNREAD: 'unread',
@@ -323,7 +330,7 @@ axiom.Github = function(username, token, format, repository) {
 	};
 
 	var url= [
-	    'http://github.com/api/v2',
+	    ,
 	    this.getFormat(),
 	    'user/keys/remove'
 	].join('/');
@@ -333,7 +340,25 @@ axiom.Github = function(username, token, format, repository) {
 	return content.email;
     };
 
-    /*  */
+    /* Commits */
+    this.getAllCommits = function(from, project, branch) {
+	var post_data = {
+	    login: username,
+	    token: this.getToken()
+	};
+
+	var url= [
+	    this.API_VERSIONS[this.API_VERSION],
+	    this.getFormat(),
+	    'commits/list',
+	    from,
+	    (project||this.repository),
+	    (branch||'master')
+	].join('/');
+
+	var content = axiom.HTTP.post(url, post_data);
+	return content.commits;
+    };
 
     return this;
 };
